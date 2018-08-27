@@ -23,6 +23,8 @@ class App extends React.Component {
       errorMessage: '',
       loading: false
     };
+    this.onSubmit = this.onSubmit.bind(this);
+    this.onChange = this.onChange.bind(this);
   }
 
 
@@ -39,7 +41,7 @@ class App extends React.Component {
     const p1PositionsDiscovered = await battleship.methods.getP1Hits().call();
     const p2PositionsDiscovered = await battleship.methods.getP2Hits().call();
     const battleshipAddress = await battleship.options.address
-    this.setState({ owner, player1, player2, balance, p1NumberOfGuesses, p2NumberOfGuesses, 
+    this.setState({ owner, player1, player2, balance, p1NumberOfGuesses, p2NumberOfGuesses,
       p1NumberOfHits, p2NumberOfHits, p1PositionsDiscovered, p2PositionsDiscovered });
 
   }
@@ -60,11 +62,11 @@ class App extends React.Component {
 
     this.setState({ message: 'Waiting on transaction success...' });
 
-    await battleship.methods.startGame().send({ 
+    await battleship.methods.startGame().send({
       value: web3.utils.toWei(this.state.value, 'ether'),
       from: web3.eth.accounts[1],
       to: web3.eth.accounts[0],    // owner holds the funds
-      gas: '1000000' 
+      gas: '1000000'
     });
 
     this.setState({ message: 'You have been entered!' });
@@ -74,28 +76,28 @@ class App extends React.Component {
   // ACTION: ACCEPT CHALLENGE (Player 2)
   // ================================================================================
 
-  // onSubmit = async event => {
-  //   event.preventDefault();
+  onChange = async event => {
+    event.preventDefault();
 
-  //   const accounts = await web3.eth.getAccounts();
-  //   const player2 = accounts[1];
-  //   console.log(player2);
-  //   // if (!player2) {
-  //   //   alert('MetaMask is not enabled!');
-  //   // }
+    const accounts = await web3.eth.getAccounts();
+    const player2 = accounts[1];
+    console.log(player2);
+    // if (!player2) {
+    //   alert('MetaMask is not enabled!');
+    // }
 
-  //   this.setState({ message: 'Waiting on transaction success...' });
+    this.setState({ message: 'Waiting on transaction success...' });
 
-  //   await battleship.methods.acceptChallenge().send({ 
-  //     guess: 'this.state.value',
-  //     value: web3.utils.toWei(this.state.value, 'ether'),
-  //     from: web3.eth.accounts[2],
-  //     to: web3.eth.accounts[0],     // owner holds the funds
-  //     gas: '1000000' 
-  //   });
-  
-  //   this.setState({ message: 'You have been entered!' });
-  // };
+    await battleship.methods.acceptChallenge().send({
+      guess: 'this.state.value',
+      value: web3.utils.toWei(this.state.value, 'ether'),
+      from: web3.eth.accounts[2],
+      to: web3.eth.accounts[0],     // owner holds the funds
+      gas: '1000000'
+    });
+
+    this.setState({ message: 'You have been entered!' });
+  };
 
   render() {
     return (
@@ -108,7 +110,7 @@ class App extends React.Component {
       <div>
         <form onSubmit={this.onSubmit} >
           <h2>START GAME</h2>
-          <h4>To start a game, please submit your address, board, and 5 ETH</h4>
+          <h4>To start a game, please submit your board and 5 ETH</h4>
           <div>
           <label>Entrance fee:</label>
             <input
@@ -123,46 +125,45 @@ class App extends React.Component {
       <div>
         <ul>
           <li>Owner:    {this.state.owner}</li>
-          <li>Player1:  {this.state.player1}</li> 
-          <li>Balance:  {this.state.balance}</li>  
+          <li>Player1:  {this.state.player1}</li>
+          <li>Balance:  {this.state.balance}</li>
         </ul>
       </div>
-      </React.Fragment> /* @dev added here in order to comment out following lines, if
-                                uncomment, delete. It's duplicated on line 161
-                        */
-      // <div>
-      //   <form onSubmit={this.onSubmit}>
-      //     <h2>ACCEPT CHALLENGE</h2>
-      //     <h4>To accept the challenge, please submit your address, board, guess, and 5 ETH</h4>
-      //     <div>
-      //       <label>Your guess: </label>
-      //       <input    
-      //         name="acceptChallenge"
-      //         guess={this.state.value}
-      //         onChange={event => this.setState({ guess: event.target.value })}
-      //       /><br />
-      //       <label>Entrance fee:</label>
-      //       <input
-      //         name="acceptChallenge"
-      //         value={this.state.value}
-      //         onChange={event => this.setState({ value: event.target.value })}
-      //       /><br />
-      //     </div>
-      //     <button>Enter</button>
-      //   </form>
-      // </div>
-      // <div>
-      //   <ul>
-      //     <li>Owner:    {this.state.owner}</li>
-      //     <li>Player1:  {this.state.player1}</li> 
-      //     <li>Player2:  {this.state.player2}</li>  
-      //     <li>Balance:  {this.state.balance}</li>  
-      //   </ul>
-      // </div>
-      // </React.Fragment>
+      <div>
+        <form onSubmit={this.onSubmit} >
+          <h2>ACCEPT CHALLENGE</h2>
+          <h4>To accept the challenge, please submit your board and 5 ETH</h4>
+          <div>
+          <label>Entrance fee:</label>
+            <input
+              name="acceptChallenge"
+              value={this.state.value}
+              onChange={event => this.setState({ value: event.target.value })}
+            /><br />
+          </div>
+          <div>
+          <label>Guess:</label>
+            <input
+              name="acceptChallenge"
+              guess={this.state.value}
+              onChange={event => this.setState({ value: event.target.value })}
+            /><br />
+          </div>
+          <button>Enter</button>
+        </form>
+      </div>
+      <div>
+        <ul>
+          <li>Owner:    {this.state.owner}</li>
+          <li>Player1:  {this.state.player1}</li>
+          <li>Player2:  {this.state.player2}</li>
+          <li>Balance:  {this.state.balance}</li>
+          <li>Guess:    {this.state.guess}</li>
+        </ul>
+      </div>
+      </React.Fragment>
     );
   }
 }
 
 export default App;
-
